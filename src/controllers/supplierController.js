@@ -134,8 +134,10 @@ class SupplierController {
 
             // Extract unique product names and sort alphabetically
             const uniqueProducts = productsData
-                ? [...new Set(productsData.map(p => p.urun_adi).filter(Boolean))]
+                ? [...new Set(productsData.map(p => p.urun_adi).filter(Boolean))].sort()
                 : [];
+
+            console.log(`Found ${uniqueProducts.length} unique products for tid ${tidInt}`);
 
             // Combine data
             const result = {
