@@ -5,7 +5,6 @@ const SafetyController = require('../controllers/safetyController');
 const ChatController = require('../controllers/chatController');
 const SdsController = require('../controllers/sdsController');
 const RawMaterialController = require('../controllers/rawMaterialController');
-const NewsController = require('../controllers/newsController');
 const TdsController = require('../controllers/tdsController');
 const CompanyController = require('../controllers/companyController');
 const AdminController = require('../controllers/adminController');
@@ -29,10 +28,7 @@ router.post('/analyze-sds', upload.single('file'), SdsController.analyzeSds);
 router.post('/raw-material-details', RawMaterialController.getRawMaterialDetails);
 router.post('/identify-chemical', OcrController.identifyChemical);
 
-// News Routes
-router.get('/news', NewsController.getNews);
-router.get('/news/categories', NewsController.getCategories);
-router.post('/news/fetch-daily', NewsController.fetchDailyNews);
+
 
 router.post('/tds-data', TdsController.getTdsData);
 
