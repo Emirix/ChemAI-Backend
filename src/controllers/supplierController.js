@@ -122,18 +122,31 @@ class SupplierController {
 
             // Get all products for this supplier
             console.log(`Fetching products for tid: ${tidInt}`);
-            const { data: productsData, error: productsError } = await supabase
+
+            // Try fetching by to_tid first
+            let { data: productsData, error: productsError } = await supabase
                 .from('tedarikciler_urunler')
                 .select('urun_adi')
                 .eq('to_tid', tidInt)
                 .order('urun_adi', { ascending: true });
 
+            // If no data or error, attempt with to_cari (aligning with yetkililer check)
+            if ((!productsData || productsData.length === 0) && !productsError) {
+                console.log(`No products found with to_tid, trying to_cari for tid: ${tidInt}`);
+                const { data: altProductsData, error: altProductsError } = await supabase
+                    .from('tedarikciler_urunler')
+                    .select('urun_adi')
+                    .eq('to_cari', tidInt)
+                    .order('urun_adi', { ascending: true });
+
+                if (!altProductsError && altProductsData && altProductsData.length > 0) {
+                    productsData = altProductsData;
+                    console.log(`Found ${productsData.length} products using to_cari`);
+                }
+            }
+
             if (productsError) {
                 console.error("Products fetch error:", productsError);
-                console.log("No products found or error fetching products");
-            } else {
-                console.log(`Raw products data length: ${productsData?.length || 0}`);
-                console.log(`First few products:`, productsData?.slice(0, 3));
             }
 
             // Extract unique product names and sort alphabetically
@@ -147,7 +160,7 @@ class SupplierController {
             // Combine data
             const result = {
                 ...supplierData,
-                contacts: contactsData || [],
+                contacts: (contactsData && contactsData.length > 0) ? [contactsData[0]] : [],
                 all_products: uniqueProducts
             };
 
