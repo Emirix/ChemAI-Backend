@@ -86,13 +86,14 @@ class SupplierController {
                 });
             }
 
-            console.log(`Fetching details for supplier tid: ${tid}`);
+            const tidInt = parseInt(tid, 10);
+            console.log(`Fetching details for supplier tid: ${tidInt}`);
 
             // Get supplier basic info
             const { data: supplierData, error: supplierError } = await supabase
                 .from('tedarikciler')
                 .select('*')
-                .eq('tid', tid)
+                .eq('tid', tidInt)
                 .single();
 
             if (supplierError) {
@@ -111,7 +112,7 @@ class SupplierController {
             const { data: contactsData, error: contactsError } = await supabase
                 .from('yetkililer')
                 .select('*')
-                .eq('to_cari', tid);
+                .eq('to_cari', tidInt);
 
             if (contactsError) {
                 console.error("Contacts fetch error:", contactsError);
@@ -123,7 +124,7 @@ class SupplierController {
             const { data: productsData, error: productsError } = await supabase
                 .from('tedarikciler_urunler')
                 .select('urun_adi')
-                .eq('to_tid', tid)
+                .eq('to_tid', tidInt)
                 .order('urun_adi', { ascending: true });
 
             if (productsError) {
