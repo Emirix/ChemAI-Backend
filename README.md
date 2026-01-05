@@ -1,121 +1,105 @@
-# 🛡️ ChemAI Backend API Dokümantasyonu
+# ChemAI Backend API Documentation 🧪
 
-ChemAI backend servisi, kimyasal güvenlik verilerini (MSDS) yapay zeka (Gemini 2.5 Flash) kullanarak dinamik olarak üretir.
+ChemAI, kimyasal madde güvenlik verileri (SDS/MSDS), teknik veri formları (TDS) ve hammadde analizleri için yapay zeka destekli bir backend servisidir. Google Gemini AI entegrasyonu ile kimyasal verileri analiz eder ve kullanıcılar için anlamlı raporlar oluşturur.
 
-## 🚀 Genel Bilgiler
+## 🚀 Teknolojiler
 
-- **Temel URL:** `http://localhost:3005/api`
-- **Model:** `gemini-2.5-flash`
-- **Format:** `application/json`
-
----
-
-## 🔐 Kimlik Doğrulama
-Şu an için API yerel ağda (local) çalışmaktadır ve ek bir API Key gerektirmez. Ancak Gemini API anahtarı backend tarafındaki `.env` dosyasında tanımlı olmalıdır.
+- **Node.js & Express**: Backend API sunucusu.
+- **Google Gemini AI**: Metin ve görsel analizi, veri üretimi.
+- **Supabase (PostgreSQL)**: Veritabanı ve kimlik doğrulama.
+- **Firebase Cloud Messaging (FCM)**: Push bildirimleri.
+- **Telegram Bot API**: Geri bildirim ve admin bildirimleri.
+- **Multer**: Dosya yükleme yönetimi.
 
 ---
 
-## 📡 Rotalar (Endpoints)
+## 🛠️ Kurulum
 
-### 1. Güvenlik Verisi Üretme
-Kimyasal bir ürün hakkında detaylı güvenlik ve tehlike verilerini getirir.
+1. Bağımlılıkları yükleyin:
+   ```bash
+   npm install
+   ```
 
-- **URL:** `/safety-data`
-- **Metot:** `POST`
-- **İstek Gövdesi (Request Body):**
+2. `.env` dosyasını oluşturun ve aşağıdaki değişkenleri tanımlayın:
+   - `GEMINI_API_KEY`: Google Gemini API anahtarı.
+   - `SUPABASE_URL` & `SUPABASE_KEY`: Supabase proje bilgileri.
+   - `TELEGRAM_BOT_TOKEN` & `TELEGRAM_CHAT_ID`: Admin bildirimleri için.
+   - `FIREBASE_SERVICE_ACCOUNT`: FCM bildirimleri için gerekli JSON yolu.
 
-| Parametre | Tip | Zorunlu mu? | Açıklama |
+3. Sunucuyu başlatın:
+   ```bash
+   npm start
+   ```
+
+---
+
+## 📡 API Uç Noktaları (Endpoints)
+
+Tüm API istekleri `/api` ön eki ile başlar. Detaylı dökümanlar için aşağıdaki bağlantıları takip edebilirsiniz:
+
+- 🛡️ [Güvenlik ve SDS İşlemleri](./docs/api/safety.md)
+- 📄 [Teknik Veri Formları (TDS)](./docs/api/safety.md#📄-teknik-veri-formları-tds) *(Not: Safety içerisinde veya ayrı dosyada detaylandırılabilir)*
+- 💬 [Sohbet ve AI Asistanı](./docs/api/chat.md)
+- 📦 [Şirket Yönetimi](./docs/api/company.md)
+- 🔔 [Bildirim Servisleri](./docs/api/notifications.md)
+- 📰 [Haberler & Hammadde](./docs/api/safety.md) *(Geliştirilmeye devam ediyor)*
+
+### Temel Endpoint Özetleri
+| Metot | Uç Nokta | Açıklama |
+| :--- | :--- | :--- |
+| `POST` | `/api/safety-data` | Kimyasal güvenlik verilerini getirir. |
+| `POST` | `/api/analyze-sds` | SDS belgesini analiz eder. |
+| `POST` | `/api/chat` | AI asistanı ile mesajlaşma. |
+| `POST` | `/api/tds-data` | TDS formunu oluşturur. |
+
+### 📦 Hammadde ve Şirket Yönetimi
+| Metot | Uç Nokta | Açıklama | Gönderilecek Veri (JSON) |
 | :--- | :--- | :--- | :--- |
-| `productName` | String | Evet | Güvenlik verisi istenen kimyasalın adı veya CAS numarası. |
-| `language` | String | Hayır | Yanıt dili (Varsayılan: "English"). Örn: "Turkish". |
+| `POST` | `/api/raw-material-details` | Hammadde detaylarını getirir. | `{ productName, language }` |
+| `POST` | `/api/companies` | Kullanıcının şirketlerini listeler. | `{ userId }` |
+| `POST` | `/api/companies/create` | Yeni bir şirket profili oluşturur. | `{ userId, companyName, email, ... }` |
 
-**Örnek İstek:**
-```json
-{
-  "productName": "Aseton",
-  "language": "Turkish"
-}
-```
+### 📰 Haberler
+| Metot | Uç Nokta | Açıklama | Parametreler (Query) |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/news` | Kimya dünyasından haberleri listeler. | `limit, offset, category` |
+| `GET` | `/api/news/categories` | Mevcut haber kategorilerini getirir. | - |
 
----
+### 🔔 Bildirimler
+| Metot | Uç Nokta | Açıklama | Gönderilecek Veri (JSON) |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/notifications/send-to-user` | Belirli bir kullanıcıya bildirim gönderir. | `{ userId, title, body, data }` |
+| `POST` | `/api/notifications/broadcast` | (Admin) Tüm kullanıcılara bildirim gönderir. | `{ topic, title, body }` |
 
-### 📥 Başarılı Yanıt (Success Response)
+### ⚙️ Yönetim (Admin)
+*Bu uç noktalar `isAdmin` middleware ile korunmaktadır.*
+| Metot | Uç Nokta | Açıklama |
+| :--- | :--- | :--- |
+| `GET` | `/api/admin/users` | Tüm kullanıcı profillerini listeler. |
+| `GET` | `/api/admin/logs` | Sistem kullanım loglarını getirir. |
+| `GET` | `/api/admin/stats` | Genel sistem istatistiklerini (Kullanıcı, Log, Sohbet sayısı) getirir. |
 
-```json
-{
-  "success": true,
-  "data": {
-    "chemicalName": "Aseton",
-    "casNumber": "67-64-1",
-    "description": "Hızlı buharlaşan, yanıcı, renksiz bir sıvıdır.",
-    "hazards": [
-      {
-        "type": "flammable",
-        "label": "Yanıcı",
-        "description": "Kolay alev alabilir sıvı ve buhar."
-      }
-    ],
-    "ppe": [
-      {
-        "type": "goggles",
-        "label": "Koruyucu Gözlük"
-      }
-    ],
-    "properties": [
-      { "label": "Kaynama Noktası", "value": "56.05 °C" }
-    ],
-    "handling": "İyi havalandırılan yerlerde kullanın. Statik deşarja karşı önlem alın.",
-    "storage": "Sıkıca kapatılmış kapta, serin ve kuru bir yerde saklayın.",
-    "firstAid": [
-      "Göz teması: Bol su ile yıkayın."
-    ],
-    "firefighting": [
-      "Su spreyi, alkole dayanıklı köpük veya kuru kimyasal kullanın."
-    ],
-    "riskAlert": {
-      "hasAlert": true,
-      "title": "Uyumsuz Karışım",
-      "description": "Güçlü oksitleyici maddelerle karıştırmayın."
-    }
-  }
-}
-```
+### 💬 Geri Bildirim (Feedback)
+| Metot | Uç Nokta | Açıklama |
+| :--- | :--- | :--- |
+| `POST` | `/api/feedback/submit` | Kullanıcı geri bildirimi gönderir (Telegram bildirimi tetikler). |
+| `GET` | `/api/feedback/all` | (Admin) Tüm geri bildirimleri listeler. |
 
 ---
 
-### ⚠️ Hata Yanıtları (Error Responses)
-
-**400 Bad Request (Eksik Parametre):**
-```json
-{
-  "success": false,
-  "error": "Product name is required"
-}
-```
-
-**500 Internal Server Error (Yapay Zeka Hatası):**
-```json
-{
-  "success": false,
-  "error": "AI Generation Failed: [Hata Mesajı]"
-}
-```
+## 🔒 Güvenlik
+Admin yetkisi gerektiren işlemler için `isAdmin` middleware'i kullanılır. Bu middleware, isteği yapan kullanıcının veritabanındaki `profiles.is_admin` alanını kontrol eder.
 
 ---
 
-## 🛠️ Teknik Şema Detayları
-
-### Hazard Types (Tehlike Türleri)
-Yanıt içindeki `type` alanı şu değerlerden birini alabilir (Flutter'da ikon seçimi için):
-- `flammable`, `irritant`, `toxic`, `corrosive`, `oxidizer`, `explosive`, `environmental`, `health_hazard`, `gas_cylinder`
-
-### PPE Types (KKD Türleri)
-- `goggles`, `gloves`, `lab_coat`, `mask`, `face_shield`, `respirator`
+## 📦 Veritabanı Şeması (Temel Tablolar)
+- `profiles`: Kullanıcı bilgileri ve ayarları.
+- `chemical_safety_cache`: Gemini tarafından üretilen SDS verilerinin önbelleği.
+- `tds_cache`: TDS verilerinin önbelleği.
+- `companies`: Kullanıcı şirket profilleri.
+- `audit_logs`: Sistem üzerindeki kritik işlemlerin kaydı.
+- `news`: Kimyasal haber verileri.
 
 ---
 
-## 🖥️ Geliştirici Komutları
-
-- **Sunucuyu Başlat (Production):** `npm start`
-- **Geliştirici Modu (Nodemon):** `npm run dev`
-- **Sağlık Kontrolü:** `GET http://localhost:3005/health`
+Created with ❤️ by **ChemAI Team**
