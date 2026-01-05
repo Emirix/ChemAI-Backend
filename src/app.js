@@ -4,6 +4,8 @@ const apiRoutes = require('./routes/api');
 
 const auditLogger = require('./middleware/logger');
 
+const path = require('path');
+
 const app = express();
 
 // Middleware
@@ -16,6 +18,11 @@ app.use(auditLogger);
 
 // Static Files
 app.use(express.static('public'));
+
+// Serve Landing Page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
 
 // Routes
 app.use('/api', apiRoutes);
