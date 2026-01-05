@@ -84,6 +84,28 @@
         </div>
     </section>
 
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container stats-container">
+            <div class="stat-item">
+                <h3 class="counter" data-target="5000">0</h3>
+                <p>Oluşturulan SDS</p>
+            </div>
+            <div class="stat-item">
+                <h3 class="counter" data-target="150">0</h3>
+                <p>Kurumsal Müşteri</p>
+            </div>
+            <div class="stat-item">
+                <h3 class="counter" data-target="99">0</h3>
+                <p>% Doğruluk Oranı</p>
+            </div>
+            <div class="stat-item">
+                <h3 class="counter" data-target="24">0</h3>
+                <p>7/24 AI Desteği</p>
+            </div>
+        </div>
+    </section>
+
     <!-- Features Section -->
     <section id="features" class="features">
         <div class="container">
@@ -148,6 +170,54 @@
                     <li><i class="fas fa-check-circle"></i> Kullanıcı Dostu Arayüz</li>
                     <li><i class="fas fa-check-circle"></i> Hızlı Dosya İşleme</li>
                 </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials / References Section -->
+    <section id="references" class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2>Bize Güvenenler</h2>
+                <p>Sektörün önde gelen firmaları ChemAI ile çalışıyor.</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                    <p class="testimonial-text">"SDS süreçlerimizi ChemAI ile %90 hızlandırdık. Artık yasal uyumluluk
+                        konusunda hiç endişemiz yok."</p>
+                    <div class="client-info">
+                        <div class="client-avatar">AK</div>
+                        <div class="client-details">
+                            <h4>Ahmet Kaya</h4>
+                            <p>Ar-Ge Müdürü, PetroKimya A.Ş.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                    <p class="testimonial-text">"Tedarikçi bulma özelliği sayesinde hammadde maliyetlerimizi ciddi
+                        oranda düşürdük. Harika bir asistan."</p>
+                    <div class="client-info">
+                        <div class="client-avatar">EY</div>
+                        <div class="client-details">
+                            <h4>Elif Yılmaz</h4>
+                            <p>Satın Alma Uzmanı, BioMed Ltd.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                    <p class="testimonial-text">"TDS hazırlamak günler sürerdi, şimdi dakikalar alıyor. ChemAI
+                        laboratuvarımızın vazgeçilmezi oldu."</p>
+                    <div class="client-info">
+                        <div class="client-avatar">MD</div>
+                        <div class="client-details">
+                            <h4>Mehmet Demir</h4>
+                            <p>Kimya Mühendisi, ColorTech Boya</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -244,6 +314,47 @@
                 navbar.classList.remove('scrolled');
             }
         });
+
+        // Counter Animation
+        const counters = document.querySelectorAll('.counter');
+        const speed = 200; // The lower the slower
+
+        const animateCounters = () => {
+            counters.forEach(counter => {
+                const updateCount = () => {
+                    const target = +counter.getAttribute('data-target');
+                    const count = +counter.innerText;
+
+                    // Lower inc to slow and higher to slow
+                    const inc = target / speed;
+
+                    if (count < target) {
+                        // Add inc to count and output in counter
+                        counter.innerText = Math.ceil(count + inc);
+                        // Call function every ms
+                        setTimeout(updateCount, 20);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCount();
+            });
+        }
+
+        // Trigger animation when stats section is in view
+        let ranOnce = false;
+        const statsSection = document.querySelector('.stats-section');
+
+        if (statsSection) {
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && !ranOnce) {
+                    animateCounters();
+                    ranOnce = true;
+                }
+            }, { threshold: 0.5 });
+
+            observer.observe(statsSection);
+        }
     </script>
 </body>
 

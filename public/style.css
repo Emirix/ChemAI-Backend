@@ -426,6 +426,110 @@ footer {
     font-size: 0.9rem;
 }
 
+/* Stats Section */
+.stats-section {
+    background: var(--primary);
+    color: var(--white);
+    padding: 3rem 0;
+    margin-top: -3rem; /* Overlap effect if desired, or standard spacing */
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 5;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 2rem;
+    text-align: center;
+}
+
+.stat-item h3 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+}
+
+.stat-item p {
+    font-size: 1.1rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+/* Testimonials Section */
+.testimonials {
+    padding: 8rem 0;
+    background-color: var(--white);
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.testimonial-card {
+    background: var(--white);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+    border: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: var(--transition);
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+}
+
+.quote-icon {
+    font-size: 2rem;
+    color: var(--light-blue);
+    margin-bottom: 1.5rem;
+}
+
+.testimonial-text {
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--text-main);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.client-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.client-avatar {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.client-details h4 {
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+}
+
+.client-details p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
 /* Animations */
 @keyframes morph {
 
