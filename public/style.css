@@ -521,20 +521,28 @@ footer {
 }
 
 @media (max-width: 768px) {
+
+    .logo,
+    .menu-toggle {
+        z-index: 1001;
+    }
+
     .nav-links {
         position: fixed;
-        top: -100%;
-        left: 0;
-        width: 100%;
+        top: 0;
+        left: -100%;
+        width: 80%;
+        height: 100vh;
         background: white;
         flex-direction: column;
-        padding: 4rem 0;
-        transition: 0.5s;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        justify-content: center;
+        padding: 2rem;
+        transition: 0.4s ease-in-out;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
     }
 
     .nav-links.active {
-        top: 0;
+        left: 0;
     }
 
     .menu-toggle {
