@@ -121,6 +121,7 @@ class SupplierController {
             }
 
             // Get all products for this supplier
+            console.log(`Fetching products for tid: ${tidInt}`);
             const { data: productsData, error: productsError } = await supabase
                 .from('tedarikciler_urunler')
                 .select('urun_adi')
@@ -130,6 +131,9 @@ class SupplierController {
             if (productsError) {
                 console.error("Products fetch error:", productsError);
                 console.log("No products found or error fetching products");
+            } else {
+                console.log(`Raw products data length: ${productsData?.length || 0}`);
+                console.log(`First few products:`, productsData?.slice(0, 3));
             }
 
             // Extract unique product names and sort alphabetically
@@ -138,6 +142,7 @@ class SupplierController {
                 : [];
 
             console.log(`Found ${uniqueProducts.length} unique products for tid ${tidInt}`);
+            console.log(`First few unique products:`, uniqueProducts.slice(0, 5));
 
             // Combine data
             const result = {
