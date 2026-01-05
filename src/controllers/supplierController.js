@@ -89,12 +89,16 @@ class SupplierController {
             const tidInt = parseInt(tid, 10);
             console.log(`Fetching details for supplier tid: ${tidInt}`);
 
-            // Get supplier basic info
-            const { data: supplierData, error: supplierError } = await supabase
-                .from('tedarikciler')
-                .select('*')
-                .eq('tid', tidInt)
-                .single();
+            // Parallelize requests for performance
+            const [
+                { data: supplierData, error: supplierError },
+                { data: contactsData, error: contactsError },
+                primaryProductsResult
+            ] = await Promise.all([
+                supabase.from('tedarikciler').select('*').eq('tid', tidInt).single(),
+                supabase.from('yetkililer').select('*').eq('to_cari', tidInt),
+                supabase.from('tedarikciler_urunler').select('urun_adi').eq('to_tid', tidInt).order('urun_adi', { ascending: true })
+            ]);
 
             if (supplierError) {
                 console.error("Supplier fetch error:", supplierError);
@@ -108,27 +112,13 @@ class SupplierController {
                 });
             }
 
-            // Get contact persons (yetkililer) for this supplier
-            const { data: contactsData, error: contactsError } = await supabase
-                .from('yetkililer')
-                .select('*')
-                .eq('to_cari', tidInt);
-
             if (contactsError) {
                 console.error("Contacts fetch error:", contactsError);
-                // Don't fail if contacts not found, just log it
                 console.log("No contacts found or error fetching contacts");
             }
 
-            // Get all products for this supplier
-            console.log(`Fetching products for tid: ${tidInt}`);
-
-            // Try fetching by to_tid first
-            let { data: productsData, error: productsError } = await supabase
-                .from('tedarikciler_urunler')
-                .select('urun_adi')
-                .eq('to_tid', tidInt)
-                .order('urun_adi', { ascending: true });
+            let productsData = primaryProductsResult.data;
+            let productsError = primaryProductsResult.error;
 
             // If no data or error, attempt with to_cari (aligning with yetkililer check)
             if ((!productsData || productsData.length === 0) && !productsError) {
@@ -163,6 +153,11 @@ class SupplierController {
                 contacts: contactsData || [],
                 all_products: uniqueProducts
             };
+
+            console.log(`Returning ${result.contacts.length} contacts for tid ${tidInt}`);
+            if (result.contacts.length > 0) {
+                console.log(`First contact:`, result.contacts[0]);
+            }
 
             res.json({
                 success: true,

@@ -19,6 +19,7 @@ app.use(auditLogger);
 // Static Files
 const publicPath = path.join(__dirname, '../public');
 app.use(express.static(publicPath));
+app.use('/public', express.static(publicPath));
 
 // Serve Landing Page (Fallback if needed, though express.static handles index.html)
 app.get('/', (req, res) => {
