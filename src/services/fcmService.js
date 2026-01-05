@@ -8,38 +8,51 @@ class FCMService {
     }
 
     init() {
+        // Try Environment Variables first
         try {
-            // Environment variables check
             const projectId = process.env.FIREBASE_PROJECT_ID;
             const privateKey = process.env.FIREBASE_PRIVATE_KEY;
             const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
             if (projectId && privateKey && clientEmail) {
-                admin.initializeApp({
-                    credential: admin.credential.cert({
-                        projectId: projectId,
-                        privateKey: privateKey.replace(/\\n/g, '\n'),
-                        clientEmail: clientEmail,
-                    })
-                });
-                this.initialized = true;
-                console.log('✅ Firebase Admin initialized from environment variables');
-            } else {
-                // Fallback to service account file
-                const serviceAccountPath = path.join(process.cwd(), 'firebase-service-account.json');
+                try {
+                    admin.initializeApp({
+                        credential: admin.credential.cert({
+                            projectId: projectId,
+                            privateKey: privateKey.replace(/\\n/g, '\n'),
+                            clientEmail: clientEmail,
+                        })
+                    });
+                    this.initialized = true;
+                    console.log('✅ Firebase Admin initialized from environment variables');
+                    return;
+                } catch (envError) {
+                    console.warn('⚠️ Failed to initialize Firebase from env vars:', envError.message);
+                    // Continue to fallback
+                }
+            }
+        } catch (e) {
+            // Ignore env reading errors
+        }
 
-                if (require('fs').existsSync(serviceAccountPath)) {
+        // Fallback to service account file
+        try {
+            const serviceAccountPath = path.join(process.cwd(), 'firebase-service-account.json');
+            if (require('fs').existsSync(serviceAccountPath)) {
+                // If already initialized (e.g. partial success?), skip. 
+                // But admin.apps.length check is better.
+                if (admin.apps.length === 0) {
                     admin.initializeApp({
                         credential: admin.credential.cert(require(serviceAccountPath))
                     });
                     this.initialized = true;
                     console.log('✅ Firebase Admin initialized from service account file');
-                } else {
-                    console.warn('⚠️ Firebase configuration not found in environment or file. FCM Service will not work.');
                 }
+            } else {
+                console.warn('⚠️ Firebase configuration not found. FCM Service disabled.');
             }
-        } catch (error) {
-            console.error('❌ Error initializing Firebase Admin:', error.message);
+        } catch (fileError) {
+            console.error('❌ Error initializing Firebase from file:', fileError.message);
         }
     }
 

@@ -12,6 +12,7 @@ const AdminController = require('../controllers/adminController');
 const FeedbackController = require('../controllers/feedbackController');
 const NotificationController = require('../controllers/notificationController');
 const OcrController = require('../controllers/ocrController');
+const SupplierController = require('../controllers/supplierController');
 const { isAdmin } = require('../middleware/auth');
 
 
@@ -60,5 +61,9 @@ router.get('/feedback/test-telegram', FeedbackController.testTelegram);
 router.post('/notifications/send-to-user', NotificationController.sendToUser);
 router.post('/notifications/send-to-multiple', isAdmin, NotificationController.sendToMultipleUsers);
 router.post('/notifications/broadcast', isAdmin, NotificationController.sendToTopic);
+
+// Supplier Routes
+router.post('/suppliers/search', SupplierController.searchSuppliers);
+router.get('/suppliers/:tid', SupplierController.getSupplierDetails);
 
 module.exports = router;
