@@ -17,11 +17,12 @@ app.use(auditLogger);
 
 
 // Static Files
-app.use(express.static(path.join(__dirname, '../public')));
+const publicPath = path.join(__dirname, '../public');
+app.use(express.static(publicPath));
 
 // Serve Landing Page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+    res.sendFile(path.join(publicPath, 'index.html'));
 });
 
 // Routes
