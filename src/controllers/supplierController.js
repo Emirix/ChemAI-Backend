@@ -160,7 +160,7 @@ class SupplierController {
             // Combine data
             const result = {
                 ...supplierData,
-                contacts: (contactsData && contactsData.length > 0) ? [contactsData[0]] : [],
+                contacts: contactsData || [],
                 all_products: uniqueProducts
             };
 
