@@ -217,6 +217,7 @@ ul {
     align-items: center;
     gap: 0.8rem;
     font-weight: 600;
+    z-index: 10;
     animation: float 4s ease-in-out infinite;
 }
 
