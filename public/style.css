@@ -190,7 +190,6 @@ ul {
 .main-hero-img {
     width: 100%;
     max-width: 500px;
-    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
     box-shadow: var(--shadow);
     z-index: 2;
     animation: float 6s ease-in-out infinite;
