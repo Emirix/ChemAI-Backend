@@ -17,7 +17,7 @@ app.use(auditLogger);
 
 
 // Static Files
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Serve Landing Page
 app.get('/', (req, res) => {
